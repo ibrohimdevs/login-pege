@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="LogOut()">Log Out</button>
+
+    <script>
+        let userData = localStorage.getItem("data")
+
+        if(!userData){
+            window.location.href = "index.html"
+        }
+
+        function LogOut(){
+            localStorage.removeItem("data")
+            window.location.href = "index.html"
+        }
+    </script>
+    <body class="bg-gray-100 p-6">
+      <div class="container mx-auto">
+        <h1 class="text-3xl font-bold mb-4">User Table with CRUD Operations</h1>
+    
+        <div class="mb-6">
+          <input id="newUserName" type="text" placeholder="Name" class="px-4 py-2 border rounded mr-2" />
+          <input id="newUserEmail" type="email" placeholder="Email" class="px-4 py-2 border rounded mr-2" />
+          <button id="addUserBtn" class="bg-green-500 text-white px-4 py-2 rounded">
+            Add User
+          </button>
+        </div>
+        <button>Log Out</button>
+    
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr class="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <th class="py-3 px-6 text-left">Name</th>
+              <th class="py-3 px-6 text-left">Email</th>
+              <th class="py-3 px-6 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTable" class="text-gray-600 text-sm font-light">
+          </tbody>
+        </table>
+      </div>
+    
+      <!-- Modal -->
+      <div id="infoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-1/3">
+          <h2 class="text-2xl font-bold mb-4">User Info</h2>
+          <p><strong>Name:</strong> <span id="modalUserName"></span></p>
+          <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+          <button id="closeModal" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+            Close
+          </button>
+        </div>
+      </div>
+      <!-- edit Modal -->
+      <div id="editoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-1/3">
+          <h2 class="text-2xl font-bold mb-4">User edit</h2>
+          <label for="name">Name:</label>
+          <input class="editName" type="text" placeholder="name">
+          <br>
+          <label for="name">Email:</label>
+          <input class="editEmal" type="text" placeholder="email">
+          <button id="closeModalEdit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+            Close
+          </button>
+          <button id="closeModalEditOk" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+            Edit
+          </button>
+        </div>
+      </div>
+      <!-- delete Modal -->
+      <div id="delModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-1/3">
+          <h2 class="text-2xl font-bold mb-4">User o'chirish</h2>
+          <button id="closeModalDel" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+            Close
+          </button>
+          <button id="closeModalDelOk" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+            Delete
+          </button>
+        </div>
+      </div>
+      <!-- Main modal -->
+      
+    
+    <!-- 
+      <button data-modal-target="default-modal" data-modal-toggle="default-modal"
+        class="modalbtn block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        type="button">
+        Toggle modal
+      </button> -->
+    
+    
+      <!-- Main modal -->
+     
+    
+    
+      <script>
+        // Foydalanuvchi ma'lumotlari
+        let users = [
+          { name: "John Doe", email: "john.doe@example.com" },
+          { name: "Jane Smith", email: "jane.smith@example.com" },
+          { name: "Michael Johnson", email: "michael.johnson@example.com" },
+        ];
+        let tables = document.querySelector("#userTable");
+        let addButton = document.querySelector("#addUserBtn");
+        let nameInput = document.getElementById("newUserName");
+        function getFetch() {
+          let row = users.map((item, index) => {
+            return `<tr class="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <td class="py-3 px-6 text-left">${item.name}</td>
+                        <td class="py-3 px-6 text-left">${item.email}</td>
+                        <td class="py-3 px-6 text-center">
+                            <button onclick="info(${index})" class="infoBtn bg-blue-500 text-white px-4 py-2 rounded mr-2"  >Info</button>
+                            <button onclick="edit(${index})" class="editBtn bg-yellow-500 text-white px-4 py-2 rounded mr-2" >Edit</button>
+                            <button onclick="del(${index})" class="deleteBtn bg-red-500 text-white px-4 py-2 rounded" >Delete</button>
+                        </td>
+                     </tr>`;
+          })
+          tables.innerHTML = row.join("");
+        }
+        getFetch();
+    
+        addButton.addEventListener("click", () => {
+          addUsers();
+        });
+    
+        function addUsers() {
+          let emailInput = document.getElementById("newUserEmail");
+          let infoBtn = document.getElementsByClassName("infoBtn");
+          let obg = {
+            name: nameInput.value,
+            email: emailInput.value,
+          };
+    
+          if (nameInput.value && emailInput.value) {
+            users.push(obg);
+            getFetch();
+            nameInput.value = "";
+            emailInput.value = "";
+          } else {
+            alert("Iltimos barcha ma`lumotlarni to`ldiring");
+          }
+        }
+        
+        let closeModal = document.getElementById('closeModal')
+        let modalUserName = document.getElementById('modalUserName')
+        let modalUserEmail = document.getElementById('modalUserEmail')
+        let indexArray = null;
+    
+        function info(index) {
+          modalUserName.innerHTML = users[index].name;
+          modalUserEmail.innerHTML = users[index].email;
+          document.querySelector("#infoModal").classList.remove("hidden")
+          
+        }
+        closeModal.addEventListener('click', ()=>{
+          document.querySelector("#infoModal").classList.add("hidden")
+        })
+        function edit(index) {
+          let editName = document.querySelector(".editName")
+          let editEmal = document.querySelector(".editEmal")
+          editName.value = users[index].name
+          editEmal.value = users[index].email
+          document.querySelector("#editoModal").classList.remove("hidden") 
+          indexArray = index 
+        }
+        document.querySelector("#closeModalEditOk").addEventListener('click', ()=>{
+          let editName = document.querySelector(".editName")
+          let editEmal = document.querySelector(".editEmal")
+          users[indexArray].name = editName.value
+          users[indexArray].email = editEmal.value
+          document.querySelector("#editoModal").classList.add("hidden")
+          getFetch();
+        })
+        
+        document.querySelector("#closeModalEdit").addEventListener('click', ()=>{
+          document.querySelector("#editoModal").classList.add("hidden")
+        })
+    
+        function del(index) {
+          document.querySelector("#delModal").classList.remove("hidden") 
+          indexArray = index 
+        }
+        document.querySelector("#closeModalDelOk").addEventListener('click', ()=>{
+          users.splice(indexArray, 1)
+          document.querySelector("#delModal").classList.add("hidden")    
+          getFetch();
+        })
+        document.querySelector("#closeModalDel").addEventListener('click', ()=>{
+          document.querySelector("#delModal").classList.add("hidden")
+        })
+        
+      </script>
+</body>
+</html>
